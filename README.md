@@ -2,6 +2,19 @@
 
 Code property graph for JS/ESM. Single-pass AST builds a CPG with binding-aware call resolution, then runs graph algorithms — centrality, clustering, cycle detection, blast radius, process tracing, schema auditing — with ad-hoc Cypher queries built in.
 
+## Why
+
+AI models working on codebases face a structural problem: they see files one at a time but must reason about the whole system. Without architectural awareness, models drift — they duplicate patterns, break encapsulation boundaries, introduce circular dependencies, and miss the ripple effects of changes. The longer a session runs, the worse it gets.
+
+sdd-cortex gives models (and humans) a quantitative structural map of the codebase. Numbers replace guesswork:
+
+- **Session start** — `--map` produces a compressed architecture overview (~8K text) covering every file, function, edge, and API signature. A model reads this once and understands the full topology before touching any code.
+- **Mid-development** — `--ci` and `--impact` catch what code review misses: hidden coupling, encapsulation violations, unintended blast radius. The model checks its own work against the actual dependency graph, not its fading memory of the code.
+- **Refactoring** — `--clusters` and `--context` reveal module boundaries and call chains. Before moving or renaming anything, the model sees exactly what depends on what, and how deep the change propagates.
+- **Accumulated drift** — `--schema-audit` detects dead definitions, broken references, and schema-code divergence. These are the silent bugs that pass every test but rot the architecture.
+
+The core idea: if a model can see the graph, it can reason about the graph. Without it, the model is navigating blind — and "navigating blind" at 200K tokens per session is expensive blindness.
+
 ## Install
 
 ```bash
