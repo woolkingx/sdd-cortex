@@ -1,0 +1,587 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/statement.json",
+  "definitions": {
+    "ExpressionStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ExpressionStatement"
+            },
+            "expression": {},
+            "directive": {
+              "type": "string"
+            }
+          },
+          "required": ["expression"]
+        }
+      ]
+    },
+    "BlockStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "BlockStatement"
+            },
+            "body": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["body"]
+        }
+      ]
+    },
+    "EmptyStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "EmptyStatement"
+            }
+          }
+        }
+      ]
+    },
+    "DebuggerStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "DebuggerStatement"
+            }
+          }
+        }
+      ]
+    },
+    "WithStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "WithStatement"
+            },
+            "object": {},
+            "body": {}
+          },
+          "required": ["object", "body"]
+        }
+      ]
+    },
+    "ReturnStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ReturnStatement"
+            },
+            "argument": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "LabeledStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "LabeledStatement"
+            },
+            "label": {
+              "$ref": "node.json#/definitions/Identifier"
+            },
+            "body": {}
+          },
+          "required": ["label", "body"]
+        }
+      ]
+    },
+    "BreakStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "BreakStatement"
+            },
+            "label": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ContinueStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ContinueStatement"
+            },
+            "label": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "IfStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "IfStatement"
+            },
+            "test": {},
+            "consequent": {},
+            "alternate": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["test", "consequent"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "SwitchStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "SwitchStatement"
+            },
+            "discriminant": {},
+            "cases": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SwitchCase"
+              }
+            }
+          },
+          "required": ["discriminant", "cases"]
+        }
+      ]
+    },
+    "SwitchCase": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "SwitchCase"
+            },
+            "test": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "consequent": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["consequent"]
+        }
+      ],
+      "x-graph": { "complexity": true, "condition": "node.test != null" }
+    },
+    "ThrowStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ThrowStatement"
+            },
+            "argument": {}
+          },
+          "required": ["argument"]
+        }
+      ]
+    },
+    "TryStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "TryStatement"
+            },
+            "block": {
+              "$ref": "#/definitions/BlockStatement"
+            },
+            "handler": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CatchClause"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "finalizer": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/BlockStatement"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["block"]
+        }
+      ]
+    },
+    "CatchClause": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "CatchClause"
+            },
+            "param": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "body": {
+              "$ref": "#/definitions/BlockStatement"
+            }
+          },
+          "required": ["body"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "WhileStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "WhileStatement"
+            },
+            "test": {},
+            "body": {}
+          },
+          "required": ["test", "body"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "DoWhileStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "DoWhileStatement"
+            },
+            "body": {},
+            "test": {}
+          },
+          "required": ["body", "test"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "ForStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ForStatement"
+            },
+            "init": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "test": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "update": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "body": {}
+          },
+          "required": ["body"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "ForInStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ForInStatement"
+            },
+            "left": {},
+            "right": {},
+            "body": {}
+          },
+          "required": ["left", "right", "body"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "ForOfStatement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ForOfStatement"
+            },
+            "left": {},
+            "right": {},
+            "body": {},
+            "await": {
+              "type": "boolean"
+            }
+          },
+          "required": ["left", "right", "body", "await"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "VariableDeclaration": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "VariableDeclaration"
+            },
+            "declarations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/VariableDeclarator"
+              }
+            },
+            "kind": {
+              "enum": ["var", "let", "const", "using", "await using"]
+            }
+          },
+          "required": ["declarations", "kind"]
+        }
+      ]
+    },
+    "VariableDeclarator": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "VariableDeclarator"
+            },
+            "id": {},
+            "init": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["id"]
+        }
+      ]
+    },
+    "Statement": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ExpressionStatement"
+        },
+        {
+          "$ref": "#/definitions/BlockStatement"
+        },
+        {
+          "$ref": "#/definitions/EmptyStatement"
+        },
+        {
+          "$ref": "#/definitions/DebuggerStatement"
+        },
+        {
+          "$ref": "#/definitions/WithStatement"
+        },
+        {
+          "$ref": "#/definitions/ReturnStatement"
+        },
+        {
+          "$ref": "#/definitions/LabeledStatement"
+        },
+        {
+          "$ref": "#/definitions/BreakStatement"
+        },
+        {
+          "$ref": "#/definitions/ContinueStatement"
+        },
+        {
+          "$ref": "#/definitions/IfStatement"
+        },
+        {
+          "$ref": "#/definitions/SwitchStatement"
+        },
+        {
+          "$ref": "#/definitions/ThrowStatement"
+        },
+        {
+          "$ref": "#/definitions/TryStatement"
+        },
+        {
+          "$ref": "#/definitions/WhileStatement"
+        },
+        {
+          "$ref": "#/definitions/DoWhileStatement"
+        },
+        {
+          "$ref": "#/definitions/ForStatement"
+        },
+        {
+          "$ref": "#/definitions/ForInStatement"
+        },
+        {
+          "$ref": "#/definitions/ForOfStatement"
+        },
+        {
+          "$ref": "function.json#/definitions/FunctionDeclaration"
+        },
+        {
+          "$ref": "#/definitions/VariableDeclaration"
+        }
+      ]
+    }
+  }
+}

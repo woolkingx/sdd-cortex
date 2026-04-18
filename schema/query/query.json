@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "query/query.json",
+  "title": "QueryResults",
+  "description": "Query block IO: context, impact, symbol lookup return types.",
+
+  "definitions": {
+
+    "ContextResult": {
+      "description": "360-degree context for a target symbol or file.",
+      "type": "object",
+      "properties": {
+        "target":     { "type": "string", "description": "Query target (symbol name, file::fn, or file path)" },
+        "symbols":    { "type": "array", "items": { "$ref": "schema/graph/node.json#/definitions/GraphNode" }, "description": "Resolved symbol nodes" },
+        "callers":    { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" }, "description": "File-level incoming edges" },
+        "callees":    { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" }, "description": "File-level outgoing edges" },
+        "fnCallers":  { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" }, "description": "Symbol-level incoming edges" },
+        "fnCallees":  { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" }, "description": "Symbol-level outgoing edges" }
+      },
+      "required": ["target", "symbols", "callers", "callees", "fnCallers", "fnCallees"]
+    },
+
+    "ImpactDepth": {
+      "description": "One depth level in blast radius BFS.",
+      "type": "object",
+      "properties": {
+        "depth": { "type": "integer", "minimum": 1 },
+        "nodes": { "type": "array", "items": { "$ref": "schema/graph/node.json#/definitions/GraphNode" } },
+        "files": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["depth", "nodes", "files"]
+    },
+
+    "ImpactResult": {
+      "description": "Blast radius analysis result.",
+      "type": "object",
+      "properties": {
+        "target":    { "type": "string", "description": "Query target" },
+        "direction": { "type": "string", "enum": ["upstream", "downstream"] },
+        "seeds":     { "type": "array", "items": { "type": "string" }, "description": "Seed node ids" },
+        "depths":    { "type": "array", "items": { "$ref": "#/definitions/ImpactDepth" }, "description": "Affected nodes per BFS depth" },
+        "total":     { "type": "integer", "minimum": 0, "description": "Total affected nodes" }
+      },
+      "required": ["target", "direction", "seeds", "depths", "total"]
+    },
+
+    "ImpactOpts": {
+      "description": "Options for impact query.",
+      "type": "object",
+      "properties": {
+        "direction":   { "type": "string", "enum": ["upstream", "downstream"], "default": "upstream" },
+        "maxDepth":    { "type": "integer", "minimum": 1, "default": 3 },
+        "granularity": { "type": "string", "enum": ["auto", "file", "symbol"], "default": "auto" }
+      }
+    }
+  }
+}

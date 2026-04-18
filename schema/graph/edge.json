@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "graph/edge.json",
+  "definitions": {
+    "EdgeLabel": {
+      "description": "CPG-lite edge type labels. Structural (CONTAINS, METHOD_OF), dependency (IMPORT, REEXPORT), call graph (CALL, CALLBACK).",
+      "enum": [
+        "IMPORT", "DYNAMIC_IMPORT", "REQUIRE", "REEXPORT",
+        "CONTAINS", "METHOD_OF",
+        "CALL", "CALLBACK", "CALL_INDIRECT",
+        "EXTEND", "DEFINES", "HAS_PROPERTY", "REF"
+      ]
+    },
+    "SymbolRef": {
+      "type": "object",
+      "properties": {
+        "name":   { "type": "string" },
+        "label":  { "$ref": "schema/graph/node.json#/definitions/NodeLabel" },
+        "schema": { "type": ["string", "null"] }
+      },
+      "required": ["name"]
+    },
+    "EdgeAttributes": {
+      "type": "object",
+      "properties": {
+        "resolved": { "type": "boolean", "default": true },
+        "dynamic":  { "type": "boolean", "default": false },
+        "symbols":  { "type": "array", "items": { "$ref": "#/definitions/SymbolRef" } },
+        "weight":   { "type": "number", "minimum": 0, "default": 1 }
+      }
+    },
+    "GraphEdge": {
+      "description": "A directed edge in the code property graph. Carries endpoint labels for cross-level analysis.",
+      "type": "object",
+      "properties": {
+        "from":      { "type": "string", "description": "Source node id" },
+        "to":        { "type": "string", "description": "Target node id" },
+        "label":     { "$ref": "#/definitions/EdgeLabel" },
+        "fromLabel": { "$ref": "schema/graph/node.json#/definitions/NodeLabel", "description": "Source node label (denormalized)" },
+        "toLabel":   { "$ref": "schema/graph/node.json#/definitions/NodeLabel", "description": "Target node label (denormalized)" },
+        "loc":       { "$ref": "schema/graph/node.json#/definitions/SourceLoc" },
+        "attrs":     { "$ref": "#/definitions/EdgeAttributes" }
+      },
+      "required": ["from", "to", "label"]
+    }
+  }
+}

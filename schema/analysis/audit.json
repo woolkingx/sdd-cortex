@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "analysis/audit.json",
+  "title": "SchemaAudit",
+  "description": "Schema self-audit: dead definitions, broken refs, cycles.",
+
+  "definitions": {
+
+    "BrokenRef": {
+      "description": "A $ref that fails to resolve.",
+      "type": "object",
+      "properties": {
+        "from":   { "type": "string", "description": "Source definition or file" },
+        "ref":    { "type": "string", "description": "The $ref path" },
+        "reason": { "type": "string", "enum": ["not_found", "invalid_path", "circular_only"] }
+      },
+      "required": ["from", "ref", "reason"]
+    },
+
+    "SchemaAuditResult": {
+      "description": "Results of schema self-audit: structural problems in JSON Schema files.",
+      "type": "object",
+      "properties": {
+        "total_definitions":  { "type": "integer", "minimum": 0 },
+        "total_refs":         { "type": "integer", "minimum": 0 },
+        "total_properties":   { "type": "integer", "minimum": 0 },
+        "dead_definitions":   { "type": "array", "items": { "type": "string" }, "description": "Definition ids not referenced by any $ref" },
+        "broken_refs":        { "type": "array", "items": { "$ref": "#/definitions/BrokenRef" } },
+        "ref_cycles":         { "type": "array", "items": { "$ref": "schema/analysis/findings.json#/definitions/CycleInfo" } },
+        "duplicate_names":    { "type": "array", "items": { "type": "string" }, "description": "Definition names appearing in multiple schema files" },
+        "orphan_files":       { "type": "array", "items": { "type": "string" }, "description": "Schema files not referenced by any $ref" }
+      },
+      "required": ["total_definitions", "total_refs", "dead_definitions", "broken_refs", "ref_cycles", "duplicate_names", "orphan_files"]
+    }
+
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "output/output.json",
+  "title": "OutputBlock",
+  "description": "Output block IO: render options and format types.",
+
+  "definitions": {
+
+    "RenderOpts": {
+      "description": "Options for render dispatcher.",
+      "type": "object",
+      "properties": {
+        "format":    { "type": "string", "enum": ["text", "json", "mermaid", "swimlane", "graph", "summary", "table"], "default": "text" },
+        "noColor":   { "type": "boolean", "default": false },
+        "compact":   { "type": "boolean", "default": false }
+      }
+    },
+
+    "SwimlaneOpts": {
+      "description": "Options for swimlane renderer.",
+      "type": "object",
+      "properties": {
+        "maxWidth":  { "type": "integer", "minimum": 40, "default": 120 },
+        "maxFiles":  { "type": "integer", "minimum": 1, "default": 20 }
+      }
+    },
+
+    "ReportFormat": {
+      "description": "Available output format types.",
+      "type": "string",
+      "enum": ["json", "text", "mermaid"]
+    }
+  }
+}

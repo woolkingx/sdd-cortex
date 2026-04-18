@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/function.json",
+  "definitions": {
+    "Function": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "params": {
+              "type": "array",
+              "items": {}
+            },
+            "body": {},
+            "generator": {
+              "type": "boolean"
+            },
+            "expression": {
+              "type": "boolean"
+            },
+            "async": {
+              "type": "boolean"
+            }
+          },
+          "required": ["params", "body", "generator", "expression", "async"]
+        }
+      ]
+    },
+    "FunctionDeclaration": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Function"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "FunctionDeclaration"
+            },
+            "id": {
+              "$ref": "node.json#/definitions/Identifier"
+            },
+            "body": {}
+          },
+          "required": ["id"]
+        }
+      ],
+      "x-graph": { "nodeLabel": "FUNCTION", "edgeLabel": "CONTAINS" }
+    },
+    "AnonymousFunctionDeclaration": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Function"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "FunctionDeclaration"
+            },
+            "id": {
+              "type": "null"
+            },
+            "body": {}
+          },
+          "required": ["id"]
+        }
+      ]
+    }
+  }
+}

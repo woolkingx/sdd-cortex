@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "cli/cli.json",
+  "title": "CliInterface",
+  "description": "CLI-specific arg definitions. Maps string flags to ToolRequest. Replaceable — other interfaces (MCP, web) skip this entirely.",
+
+  "definitions": {
+
+    "CliFlag": {
+      "description": "Boolean CLI flags.",
+      "type": "string",
+      "enum": ["--json", "--mermaid", "--swimlane", "--ci", "--help", "--schema-audit", "--map", "--schema-blocks", "--clusters", "--processes"]
+    },
+
+    "CliOption": {
+      "description": "CLI options that take a value argument.",
+      "type": "string",
+      "enum": ["--root", "--schema", "--registry", "--ext", "-o", "--output", "--impact", "--context", "--direction", "--depth", "--threshold", "--query"]
+    },
+
+    "CliArgs": {
+      "description": "Parsed CLI arguments before conversion to ToolRequest.",
+      "type": "object",
+      "properties": {
+        "paths":       { "type": "array", "items": { "type": "string" }, "description": "Positional arguments (files/dirs)" },
+        "json":        { "type": "boolean", "default": false },
+        "mermaid":     { "type": "boolean", "default": false },
+        "swimlane":    { "type": "boolean", "default": false },
+        "ci":          { "type": "boolean", "default": false },
+        "help":        { "type": "boolean", "default": false },
+        "root":        { "type": "string" },
+        "schema":      { "type": "string" },
+        "registry":    { "type": "string" },
+        "ext":         { "type": "string", "default": ".mjs,.js" },
+        "output":      { "type": "string" },
+        "impact":      { "type": "string", "description": "Target symbol for impact analysis" },
+        "context":     { "type": "string", "description": "Target symbol for context query" },
+        "direction":   { "type": "string", "enum": ["upstream", "downstream"], "default": "upstream" },
+        "depth":       { "type": "integer", "minimum": 1, "default": 3 },
+        "threshold":   { "type": "number", "minimum": 0, "maximum": 1, "default": 0.4 },
+        "query":       { "type": "string", "description": "Cypher query string" },
+        "schemaAudit": { "type": "boolean", "default": false },
+        "schemaBlocks":{ "type": "boolean", "default": false },
+        "map":         { "type": "boolean", "default": false },
+        "clusters":    { "type": "boolean", "default": false },
+        "processes":   { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

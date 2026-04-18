@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "graph/node.json",
+  "definitions": {
+    "NodeLabel": {
+      "description": "CPG-lite node type labels",
+      "enum": ["FILE", "FUNCTION", "CLASS", "METHOD", "VARIABLE", "NAMESPACE", "PARAMETER", "SCHEMA_FILE", "DEFINITION", "PROPERTY"]
+    },
+    "SourceLoc": {
+      "type": "object",
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end":   { "type": "integer", "minimum": 0 },
+        "line":  { "type": "integer", "minimum": 1 }
+      }
+    },
+    "NodeAttributes": {
+      "description": "Label-polymorphic attributes. FUNCTION/METHOD carry code-level detail. CLASS carries structure. DEFINITION/PROPERTY carry schema metadata.",
+      "type": "object",
+      "properties": {
+        "async":      { "type": "boolean", "default": false },
+        "generator":  { "type": "boolean", "default": false },
+        "static":     { "type": "boolean", "default": false },
+        "computed":   { "type": "boolean", "default": false },
+        "arrow":      { "type": "boolean", "default": false },
+        "abstract":   { "type": "boolean", "default": false },
+        "lines":      { "type": "integer", "minimum": 0 },
+        "complexity": { "type": "integer", "minimum": 1 },
+        "paramCount": { "type": "integer", "minimum": 0 },
+        "params":     { "type": "array", "items": { "type": "string" }, "description": "Parameter names in order" },
+        "returns":    { "type": ["string", "null"], "description": "Return type from JSDoc @returns or inferred" },
+        "jsdoc":      { "type": ["string", "null"], "description": "First line of JSDoc description" },
+        "signature":  { "type": "string", "description": "Human-readable signature: name(params) → returnType" },
+        "body":       { "type": "string", "description": "Full source code of the function/method body" },
+        "superClass": { "type": "string", "description": "For CLASS nodes: superclass name" },
+        "methods":    { "type": "array", "items": { "type": "string" }, "description": "For CLASS nodes: method names" },
+        "type":       { "type": ["string", "null"], "description": "For DEFINITION/PROPERTY: schema type" },
+        "required":   { "type": "array", "items": { "type": "string" }, "description": "For DEFINITION: required fields" },
+        "hasXMethods": { "type": "boolean", "description": "For DEFINITION: has x-methods extension" },
+        "hasXSource":  { "type": "boolean", "description": "For DEFINITION: has x-source extension" },
+        "hasRef":     { "type": "boolean", "description": "For PROPERTY: has $ref" },
+        "refTarget":  { "type": ["string", "null"], "description": "For PROPERTY: $ref target path" }
+      }
+    },
+    "GraphNode": {
+      "description": "A node in the code property graph. Self-describing: carries label, parent chain, file, and visibility.",
+      "type": "object",
+      "properties": {
+        "id":       { "type": "string", "description": "Unique node ID. FILE: 'lib/parser.mjs'. Symbol: 'lib/parser.mjs::parseFile'" },
+        "label":    { "$ref": "#/definitions/NodeLabel" },
+        "name":     { "type": "string", "description": "Human-readable name: filename or symbol name" },
+        "fullName": { "type": "string", "description": "Same as id — CPG convention for qualified lookup" },
+        "file":     { "type": "string", "description": "Owning file path. Same as id for FILE nodes." },
+        "parent":   { "type": ["string", "null"], "description": "Parent node id. null for FILE nodes. FILE id for top-level symbols. CLASS id for methods." },
+        "exported": { "type": "boolean", "default": false, "description": "Visibility: true if accessible outside file boundary" },
+        "loc":      { "$ref": "#/definitions/SourceLoc" },
+        "attrs":    { "$ref": "#/definitions/NodeAttributes" }
+      },
+      "required": ["id", "label", "name", "file", "parent", "exported"]
+    }
+  }
+}

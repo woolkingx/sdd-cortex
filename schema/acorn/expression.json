@@ -1,0 +1,670 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/expression.json",
+  "definitions": {
+    "ThisExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ThisExpression"
+            }
+          }
+        }
+      ]
+    },
+    "ArrayExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ArrayExpression"
+            },
+            "elements": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {},
+                  {
+                    "$ref": "#/definitions/SpreadElement"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["elements"]
+        }
+      ]
+    },
+    "ObjectExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ObjectExpression"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/Property"
+                  },
+                  {
+                    "$ref": "#/definitions/SpreadElement"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["properties"]
+        }
+      ]
+    },
+    "Property": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "Property"
+            },
+            "key": {},
+            "value": {},
+            "kind": {
+              "enum": ["init", "get", "set"]
+            },
+            "method": {
+              "type": "boolean"
+            },
+            "shorthand": {
+              "type": "boolean"
+            },
+            "computed": {
+              "type": "boolean"
+            }
+          },
+          "required": ["key", "value", "kind", "method", "shorthand", "computed"]
+        }
+      ]
+    },
+    "FunctionExpression": {
+      "allOf": [
+        {
+          "$ref": "function.json#/definitions/Function"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "FunctionExpression"
+            },
+            "body": {}
+          }
+        }
+      ],
+      "x-graph": { "nodeLabel": "FUNCTION" }
+    },
+    "UnaryExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "UnaryExpression"
+            },
+            "operator": {
+              "$ref": "operators.json#/definitions/UnaryOperator"
+            },
+            "prefix": {
+              "type": "boolean"
+            },
+            "argument": {}
+          },
+          "required": ["operator", "prefix", "argument"]
+        }
+      ]
+    },
+    "UpdateExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "UpdateExpression"
+            },
+            "operator": {
+              "$ref": "operators.json#/definitions/UpdateOperator"
+            },
+            "argument": {},
+            "prefix": {
+              "type": "boolean"
+            }
+          },
+          "required": ["operator", "argument", "prefix"]
+        }
+      ]
+    },
+    "BinaryExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "BinaryExpression"
+            },
+            "operator": {
+              "$ref": "operators.json#/definitions/BinaryOperator"
+            },
+            "left": {},
+            "right": {}
+          },
+          "required": ["operator", "left", "right"]
+        }
+      ]
+    },
+    "AssignmentExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "AssignmentExpression"
+            },
+            "operator": {
+              "$ref": "operators.json#/definitions/AssignmentOperator"
+            },
+            "left": {},
+            "right": {}
+          },
+          "required": ["operator", "left", "right"]
+        }
+      ],
+      "x-graph": { "binding": "reassignment", "condition": "node.right.type === 'Identifier'" }
+    },
+    "LogicalExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "LogicalExpression"
+            },
+            "operator": {
+              "$ref": "operators.json#/definitions/LogicalOperator"
+            },
+            "left": {},
+            "right": {}
+          },
+          "required": ["operator", "left", "right"]
+        }
+      ],
+      "x-graph": { "complexity": true, "condition": "node.operator === '&&' || node.operator === '||'" }
+    },
+    "MemberExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "MemberExpression"
+            },
+            "object": {},
+            "property": {},
+            "computed": {
+              "type": "boolean"
+            },
+            "optional": {
+              "type": "boolean"
+            }
+          },
+          "required": ["object", "property", "computed", "optional"]
+        }
+      ]
+    },
+    "ConditionalExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ConditionalExpression"
+            },
+            "test": {},
+            "alternate": {},
+            "consequent": {}
+          },
+          "required": ["test", "alternate", "consequent"]
+        }
+      ],
+      "x-graph": { "complexity": true }
+    },
+    "CallExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "CallExpression"
+            },
+            "callee": {},
+            "arguments": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {},
+                  {
+                    "$ref": "#/definitions/SpreadElement"
+                  }
+                ]
+              }
+            },
+            "optional": {
+              "type": "boolean"
+            }
+          },
+          "required": ["callee", "arguments", "optional"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "CALL", "scope": "nearest_function" }
+    },
+    "NewExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "NewExpression"
+            },
+            "callee": {},
+            "arguments": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {},
+                  {
+                    "$ref": "#/definitions/SpreadElement"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["callee", "arguments"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "CALL" }
+    },
+    "SequenceExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "SequenceExpression"
+            },
+            "expressions": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["expressions"]
+        }
+      ]
+    },
+    "ArrowFunctionExpression": {
+      "allOf": [
+        {
+          "$ref": "function.json#/definitions/Function"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ArrowFunctionExpression"
+            }
+          }
+        }
+      ]
+    },
+    "YieldExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "YieldExpression"
+            },
+            "argument": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "delegate": {
+              "type": "boolean"
+            }
+          },
+          "required": ["delegate"]
+        }
+      ]
+    },
+    "TemplateLiteral": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "TemplateLiteral"
+            },
+            "quasis": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TemplateElement"
+              }
+            },
+            "expressions": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["quasis", "expressions"]
+        }
+      ]
+    },
+    "TaggedTemplateExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "TaggedTemplateExpression"
+            },
+            "tag": {},
+            "quasi": {
+              "$ref": "#/definitions/TemplateLiteral"
+            }
+          },
+          "required": ["tag", "quasi"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "CALL" }
+    },
+    "TemplateElement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "TemplateElement"
+            },
+            "tail": {
+              "type": "boolean"
+            },
+            "value": {
+              "type": "object",
+              "properties": {
+                "cooked": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "raw": {
+                  "type": "string"
+                }
+              },
+              "required": ["raw"]
+            }
+          },
+          "required": ["tail", "value"]
+        }
+      ]
+    },
+    "SpreadElement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "SpreadElement"
+            },
+            "argument": {}
+          },
+          "required": ["argument"]
+        }
+      ],
+      "x-graph": { "binding": "spread" }
+    },
+    "AwaitExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "AwaitExpression"
+            },
+            "argument": {}
+          },
+          "required": ["argument"]
+        }
+      ]
+    },
+    "ChainExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ChainExpression"
+            },
+            "expression": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/MemberExpression"
+                },
+                {
+                  "$ref": "#/definitions/CallExpression"
+                }
+              ]
+            }
+          },
+          "required": ["expression"]
+        }
+      ]
+    },
+    "ImportExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportExpression"
+            },
+            "source": {},
+            "options": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["source", "options"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "DYNAMIC_IMPORT" }
+    },
+    "ParenthesizedExpression": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ParenthesizedExpression"
+            },
+            "expression": {}
+          },
+          "required": ["expression"]
+        }
+      ]
+    },
+    "Expression": {
+      "oneOf": [
+        {
+          "$ref": "node.json#/definitions/Identifier"
+        },
+        {
+          "$ref": "node.json#/definitions/Literal"
+        },
+        {
+          "$ref": "#/definitions/ThisExpression"
+        },
+        {
+          "$ref": "#/definitions/ArrayExpression"
+        },
+        {
+          "$ref": "#/definitions/ObjectExpression"
+        },
+        {
+          "$ref": "#/definitions/FunctionExpression"
+        },
+        {
+          "$ref": "#/definitions/UnaryExpression"
+        },
+        {
+          "$ref": "#/definitions/UpdateExpression"
+        },
+        {
+          "$ref": "#/definitions/BinaryExpression"
+        },
+        {
+          "$ref": "#/definitions/AssignmentExpression"
+        },
+        {
+          "$ref": "#/definitions/LogicalExpression"
+        },
+        {
+          "$ref": "#/definitions/MemberExpression"
+        },
+        {
+          "$ref": "#/definitions/ConditionalExpression"
+        },
+        {
+          "$ref": "#/definitions/CallExpression"
+        },
+        {
+          "$ref": "#/definitions/NewExpression"
+        },
+        {
+          "$ref": "#/definitions/SequenceExpression"
+        },
+        {
+          "$ref": "#/definitions/ArrowFunctionExpression"
+        },
+        {
+          "$ref": "#/definitions/YieldExpression"
+        },
+        {
+          "$ref": "#/definitions/TemplateLiteral"
+        },
+        {
+          "$ref": "#/definitions/TaggedTemplateExpression"
+        },
+        {
+          "$ref": "#/definitions/AwaitExpression"
+        },
+        {
+          "$ref": "#/definitions/ChainExpression"
+        },
+        {
+          "$ref": "#/definitions/ImportExpression"
+        },
+        {
+          "$ref": "#/definitions/ParenthesizedExpression"
+        }
+      ]
+    }
+  }
+}

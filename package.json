@@ -1,0 +1,28 @@
+{
+  "name": "sdd-cortex",
+  "version": "0.10.1",
+  "description": "Code property graph for JS/ESM. Single-pass AST builds a CPG with call resolution, then runs centrality, clustering, cycle detection, blast radius, process tracing, and schema auditing — with Cypher queries built in.",
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "bin": {
+    "sdd-graph": "./cli.mjs"
+  },
+  "keywords": [
+    "sdd",
+    "graph",
+    "analysis",
+    "schema",
+    "encapsulation",
+    "modularity"
+  ],
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "acorn": "^8.16.0",
+    "acorn-walk": "^8.3.5",
+    "cli-table3": "^0.6.5",
+    "cypherdotjs": "^1.0.10"
+  }
+}

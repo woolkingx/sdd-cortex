@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "tool/tool.json",
+  "title": "ToolApi",
+  "description": "Programmatic API contract for sdd-graph analysis tool. Interface-agnostic — CLI, MCP, web all consume this.",
+
+  "definitions": {
+
+    "AnalyzeOpts": {
+      "description": "Options for analyze() entry point.",
+      "type": "object",
+      "properties": {
+        "root":       { "type": "string", "description": "Project root path (default: inferred from first path)" },
+        "schema":     { "type": "string", "description": "Schema file path for registry derivation" },
+        "registry":   { "type": "string", "description": "Pre-built PublicInterfaceRegistry JSON path" },
+        "extensions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [".mjs", ".js"],
+          "description": "File extensions to scan"
+        }
+      }
+    },
+
+    "AnalyzeMode": {
+      "description": "Analysis mode — determines which pipeline to run.",
+      "type": "string",
+      "enum": ["full", "impact", "context", "clusters", "processes", "schema-audit", "schema-blocks", "map", "query"],
+      "default": "full"
+    },
+
+    "OutputFormat": {
+      "description": "Output serialization format.",
+      "type": "string",
+      "enum": ["text", "json", "mermaid", "swimlane"],
+      "default": "text"
+    },
+
+    "ToolRequest": {
+      "description": "Complete tool invocation request. Any interface (CLI, MCP, web) maps to this.",
+      "type": "object",
+      "properties": {
+        "paths":   { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Files or directories to analyze" },
+        "mode":    { "$ref": "#/definitions/AnalyzeMode" },
+        "format":  { "$ref": "#/definitions/OutputFormat" },
+        "opts":    { "$ref": "#/definitions/AnalyzeOpts" },
+        "impact":  { "$ref": "schema/query/query.json#/definitions/ImpactOpts" },
+        "context": { "type": "object", "properties": { "target": { "type": "string" } }, "required": ["target"] },
+        "process": { "type": "object", "properties": { "threshold": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.4 } } },
+        "query":   { "type": "string", "description": "Cypher query string" },
+        "output":  { "type": "string", "description": "Output file path" },
+        "ci":      { "type": "boolean", "default": false, "description": "Exit code 1 if violations found" }
+      },
+      "required": ["paths"]
+    }
+  }
+}

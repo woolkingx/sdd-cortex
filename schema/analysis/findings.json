@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "analysis/findings.json",
+  "title": "AnalysisFindings",
+  "description": "Structural problems found in the dependency graph.",
+
+  "definitions": {
+
+    "CycleInfo": {
+      "description": "A detected circular dependency cycle with enriched node info.",
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "description": "Ordered node ids forming the cycle"
+        },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "schema/graph/node.json#/definitions/GraphNode" },
+          "description": "Enriched node objects for each path entry"
+        },
+        "length":    { "type": "integer", "minimum": 2 },
+        "level":     { "type": "string", "enum": ["file", "symbol", "mixed"], "description": "Granularity of this cycle" },
+        "crossFile": { "type": "boolean", "description": "true if cycle spans multiple files" }
+      },
+      "required": ["path", "length", "level", "crossFile"],
+
+      "x-docs": {
+        "intent": "Cycle detection with CPG-lite node enrichment. level + crossFile enable granular analysis.",
+        "category": "analysis"
+      }
+    },
+
+    "Violation": {
+      "description": "A detected encapsulation violation. Uses CPG-lite node ids for caller/callee.",
+      "type": "object",
+      "properties": {
+        "caller":     { "type": "string", "description": "Caller node id (e.g. 'a.mjs::main')" },
+        "callee":     { "type": "string", "description": "Callee node id (e.g. 'b.mjs::_internal')" },
+        "callerNode": { "$ref": "schema/graph/node.json#/definitions/GraphNode" },
+        "calleeNode": { "$ref": "schema/graph/node.json#/definitions/GraphNode" },
+        "confirmed":  { "type": "boolean", "description": "true = real violation, false = name collision" },
+        "reason":     { "type": "string", "enum": ["import_link", "name_collision", "schema_public"] },
+        "crossFile":  { "type": "boolean", "description": "true if caller and callee in different files" },
+        "fn":         { "type": "string", "description": "DEPRECATED — use calleeNode.name" },
+        "definedIn":  { "type": "string", "description": "DEPRECATED — use calleeNode.file" },
+        "calledFrom": { "type": "string", "description": "DEPRECATED — use callerNode.file" }
+      },
+      "required": ["caller", "callee", "confirmed", "reason", "crossFile"],
+
+      "x-docs": {
+        "intent": "Encapsulation violation with full CPG-lite node context. crossFile + calleeNode.exported = boundary analysis.",
+        "category": "analysis"
+      }
+    },
+
+    "HotPath": {
+      "description": "A longest dependency path with enriched node info.",
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 2,
+          "description": "Ordered node ids from root to leaf"
+        },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "schema/graph/node.json#/definitions/GraphNode" },
+          "description": "Enriched node objects for each path entry"
+        },
+        "length":    { "type": "integer", "minimum": 2 },
+        "level":     { "type": "string", "enum": ["file", "symbol", "mixed"] },
+        "crossFile": { "type": "boolean" }
+      },
+      "required": ["path", "length", "level", "crossFile"],
+
+      "x-docs": {
+        "intent": "Longest dependency chains with CPG-lite enrichment. level + crossFile for granular analysis.",
+        "category": "analysis"
+      }
+    }
+
+  }
+}

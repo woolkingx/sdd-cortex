@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GraphAnalysis",
+  "description": "Schema-driven graph analysis for JS/ESM projects. Defines AST-extracted structures, dependency graph, analysis results, and optional schema overlay for encapsulation violation (穿透) detection.",
+
+  "definitions": {
+
+    "PublicInterfaceRegistry": {
+      "description": "Maps file path → public method names. Derived from project schemas (x-methods, factory returns) or manually configured. Used by schema overlay to distinguish legitimate calls from violations.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Public method names for this file"
+      },
+
+      "x-methods": {
+        "has_public": {
+          "description": "Check if a function name is public for a given file."
+        },
+        "from_schema": {
+          "description": "Auto-derive registry from JSON Schema x-methods and properties."
+        }
+      },
+      "x-tests": {
+        "has_public": ["valid_normal", "missing"],
+        "from_schema": ["valid_normal", "empty"]
+      },
+      "x-docs": {
+        "intent": "Public API contract for violation filtering. No hardcoded defaults — must be derived from schema or configured per-project.",
+        "category": "schema-overlay",
+        "notes": "Removed hardcoded openllm-agent defaults. Tool is now project-agnostic."
+      }
+    },
+
+    "AnalysisResult": {
+      "description": "Complete analysis output. Conforms to all layers: parser → graph → analysis → schema overlay.",
+      "type": "object",
+      "properties": {
+        "project":    { "type": "string", "description": "Project root path analyzed" },
+        "timestamp":  { "type": "string", "format": "date-time" },
+        "graph":      { "$ref": "schema/graph/graph.json#/definitions/Graph", "description": "The CPG-lite graph (nodes + edges + bindings)" },
+        "ast_types":  { "$ref": "schema/acorn/node.json", "description": "ESTree AST type definitions with x-graph extraction rules" },
+        "context_result": { "$ref": "schema/query/query.json#/definitions/ContextResult", "description": "Context query result" },
+        "impact_result":  { "$ref": "schema/query/query.json#/definitions/ImpactResult", "description": "Impact query result" },
+        "render_opts":    { "$ref": "schema/output/output.json#/definitions/RenderOpts", "description": "Output render options" },
+        "tool_request":   { "$ref": "schema/tool/tool.json#/definitions/ToolRequest", "description": "Tool invocation request" },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "schema/graph/node.json#/definitions/GraphNode" },
+          "description": "All graph nodes (file-level and symbol-level)"
+        },
+        "files":      { "type": "array", "items": { "$ref": "schema/parse/parsed.json#/definitions/ParsedFile" } },
+        "edges":      { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" } },
+        "cycles":     { "type": "array", "items": { "$ref": "schema/analysis/findings.json#/definitions/CycleInfo" } },
+        "violations": { "type": "array", "items": { "$ref": "schema/analysis/findings.json#/definitions/Violation" } },
+        "stats":      { "$ref": "schema/analysis/metrics.json#/definitions/AnalysisStats" },
+        "complexity":  { "type": "array", "items": { "$ref": "schema/analysis/metrics.json#/definitions/FileComplexity" } },
+        "hot_paths":  { "type": "array", "items": { "$ref": "schema/analysis/findings.json#/definitions/HotPath" } },
+        "schema_gaps":              { "type": "array", "items": { "$ref": "schema/analysis/advice.json#/definitions/SchemaGap" } },
+        "duplicate_instantiations": { "type": "array", "items": { "$ref": "schema/analysis/advice.json#/definitions/DuplicateInstantiation" } },
+        "advice":                   { "type": "array", "items": { "$ref": "schema/analysis/advice.json#/definitions/Advice" } },
+        "schema_audit": { "$ref": "schema/analysis/audit.json#/definitions/SchemaAuditResult" },
+        "registry":   {
+          "oneOf": [
+            { "$ref": "#/definitions/PublicInterfaceRegistry" },
+            { "type": "null" }
+          ],
+          "description": "null when no schema overlay is applied"
+        }
+      },
+      "required": ["project", "timestamp", "files", "edges", "cycles", "violations", "stats", "hot_paths", "advice"],
+
+      "x-docs": {
+        "intent": "Top-level output contract. JSON output conforms to this schema. CI tools consume stats for exit code.",
+        "category": "output",
+        "notes": "Renamed 'nodes' to 'files' (more accurate). Added project, timestamp, cycles, registry."
+      }
+    }
+
+  },
+
+  "x-docs": {
+    "intent": "Schema-driven graph analysis tool. AST-based dependency extraction, graph analysis, and optional schema overlay for encapsulation violation detection.",
+    "category": "tooling",
+    "notes": "Generic tool — no project-specific hardcoding. Works on any JS/ESM project. SDD projects get additional schema overlay analysis."
+  }
+}

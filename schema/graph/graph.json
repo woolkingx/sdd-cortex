@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "graph/graph.json",
+  "title": "Graph",
+  "description": "CPG-lite in-memory graph container.",
+
+  "definitions": {
+
+    "Graph": {
+      "description": "CPG-lite in-memory graph. nodes = Map<id, GraphNode>, edges = GraphEdge[].",
+      "type": "object",
+      "properties": {
+        "nodes":    { "description": "Map<nodeId, GraphNode> — flat index, not nested. FILE + FUNCTION + CLASS + METHOD nodes." },
+        "edges":    { "type": "array", "items": { "$ref": "schema/graph/edge.json#/definitions/GraphEdge" }, "description": "GraphEdge[] with label/fromLabel/toLabel" },
+        "bindings": { "description": "filePath → localName → BindingInfo. Used for call-edge resolution." }
+      },
+      "required": ["nodes", "edges", "bindings"],
+
+      "x-docs": {
+        "intent": "CPG-lite property graph. nodes is Map<id, GraphNode> (flat), not Map<file, Map<sym, attrs>> (nested).",
+        "category": "graph"
+      }
+    }
+
+  }
+}

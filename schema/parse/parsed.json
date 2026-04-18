@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "parse/parsed.json",
+  "title": "ParsedFile",
+  "description": "Parser output: file-level AST extraction results.",
+
+  "definitions": {
+
+    "ImportInfo": {
+      "description": "Import binding extracted from AST.",
+      "type": "object",
+      "properties": {
+        "name":      { "type": "string" },
+        "alias":     { "type": "string" },
+        "source":    { "type": "string" },
+        "isDefault":   { "type": "boolean", "default": false },
+        "isDynamic":   { "type": "boolean", "default": false },
+        "isNamespace": { "type": "boolean", "default": false }
+      },
+      "required": ["name", "alias", "source"],
+      "x-source": {
+        "ast": "schema/acorn/module.json#/definitions/ImportDeclaration",
+        "specifiers": [
+          "schema/acorn/module.json#/definitions/ImportSpecifier",
+          "schema/acorn/module.json#/definitions/ImportDefaultSpecifier",
+          "schema/acorn/module.json#/definitions/ImportNamespaceSpecifier"
+        ]
+      },
+      "x-docs": {
+        "intent": "Import binding from acorn ImportDeclaration. x-source traces back to AST schema.",
+        "category": "parser"
+      }
+    },
+
+    "Export": {
+      "description": "A single export declaration extracted from AST.",
+      "type": "object",
+      "properties": {
+        "name":      { "type": "string", "description": "Exported identifier name" },
+        "type":      { "type": "string", "enum": ["function", "const", "let", "class", "default", "reexport"], "description": "Declaration kind" },
+        "source":    { "type": "string", "description": "Only for re-exports: the module specifier" }
+      },
+      "required": ["name", "type"],
+
+      "x-methods": {
+        "is_reexport": {
+          "required": ["source"],
+          "properties": { "type": { "const": "reexport" } }
+        }
+      },
+      "x-tests": {
+        "is_reexport": ["valid_normal", "missing"]
+      },
+      "x-docs": {
+        "intent": "Export declaration with kind info. Supports re-export tracing.",
+        "category": "parser"
+      }
+    },
+
+    "FunctionInfo": {
+      "description": "Function metadata combining acorn AST info with analysis-layer metrics.",
+      "type": "object",
+      "properties": {
+        "name":       { "type": "string" },
+        "isExported": { "type": "boolean", "default": false },
+        "isAsync":    { "type": "boolean", "default": false },
+        "isArrow":    { "type": "boolean", "default": false, "description": "true if ArrowFunctionExpression per acorn/expression.json" },
+        "paramCount": { "type": "integer", "minimum": 0, "description": "Length of params array per schema/acorn/function.json" },
+        "lines":      { "type": "integer", "minimum": 0 },
+        "complexity": { "type": "integer", "minimum": 1 },
+        "calls":      { "type": "integer", "minimum": 0 },
+        "loc": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "integer" },
+            "end":   { "type": "integer" }
+          }
+        }
+      },
+      "required": ["name", "isExported"],
+      "x-source": {
+        "ast": "schema/acorn/function.json#/definitions/Function",
+        "expressions": ["schema/acorn/expression.json#/definitions/ArrowFunctionExpression"]
+      },
+      "x-docs": {
+        "intent": "Function-level metadata. Base structure from acorn Function schema, enriched with analysis metrics.",
+        "category": "parser"
+      }
+    },
+
+    "ClassInfo": {
+      "description": "A class declaration extracted from AST.",
+      "type": "object",
+      "properties": {
+        "name":       { "type": "string" },
+        "isExported": { "type": "boolean", "default": false },
+        "extends":    { "type": "string", "description": "Superclass name, if any" },
+        "methods":    { "type": "array", "items": { "type": "string" }, "description": "Method names defined in class body" }
+      },
+      "required": ["name", "isExported"],
+
+      "x-methods": {
+        "has_inheritance": {
+          "required": ["extends"]
+        }
+      },
+      "x-tests": {
+        "has_inheritance": ["valid_normal", "missing"]
+      },
+      "x-docs": {
+        "intent": "Class-level metadata. Enables extend-edge in graph and inheritance tracking.",
+        "category": "parser"
+      }
+    },
+
+    "ParsedFile": {
+      "description": "Complete AST extraction result for a single source file. Replaces the old regex-based Node.",
+      "type": "object",
+      "properties": {
+        "path":      { "type": "string", "description": "Relative path from project root" },
+        "imports":   { "type": "array", "items": { "$ref": "#/definitions/ImportInfo" } },
+        "exports":   { "type": "array", "items": { "$ref": "#/definitions/Export" } },
+        "functions": { "type": "array", "items": { "$ref": "#/definitions/FunctionInfo" } },
+        "classes":   { "type": "array", "items": { "$ref": "#/definitions/ClassInfo" } },
+        "calls":     { "type": "array", "items": { "type": "string" }, "description": "All CallExpression callee names (deduplicated)" },
+        "lines":     { "type": "integer", "minimum": 0 }
+      },
+      "required": ["path", "imports", "exports", "functions", "classes", "calls", "lines"],
+
+      "x-methods": {
+        "internals": {
+          "description": "Derived: functions where isExported=false. Not stored, computed from functions[]."
+        },
+        "has_imports_from": {
+          "description": "Check if this file imports from a given source path."
+        }
+      },
+      "x-tests": {
+        "internals": ["valid_normal", "empty"],
+        "has_imports_from": ["valid_normal", "missing"]
+      },
+      "x-docs": {
+        "intent": "Single file's complete AST extraction. Input to graph builder.",
+        "category": "parser",
+        "notes": "internals is derived from functions[], not stored separately — avoids duplication."
+      }
+    }
+
+  }
+}

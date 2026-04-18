@@ -1,0 +1,242 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/class.json",
+  "definitions": {
+    "Class": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "superClass": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "body": {
+              "$ref": "#/definitions/ClassBody"
+            }
+          },
+          "required": ["body"]
+        }
+      ]
+    },
+    "ClassBody": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ClassBody"
+            },
+            "body": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/MethodDefinition"
+                  },
+                  {
+                    "$ref": "#/definitions/PropertyDefinition"
+                  },
+                  {
+                    "$ref": "#/definitions/StaticBlock"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["body"]
+        }
+      ]
+    },
+    "MethodDefinition": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "MethodDefinition"
+            },
+            "key": {
+              "oneOf": [
+                {},
+                {
+                  "$ref": "#/definitions/PrivateIdentifier"
+                }
+              ]
+            },
+            "value": {
+              "$ref": "expression.json#/definitions/FunctionExpression"
+            },
+            "kind": {
+              "enum": ["constructor", "method", "get", "set"]
+            },
+            "computed": {
+              "type": "boolean"
+            },
+            "static": {
+              "type": "boolean"
+            }
+          },
+          "required": ["key", "value", "kind", "computed", "static"]
+        }
+      ],
+      "x-graph": { "nodeLabel": "METHOD", "edgeLabel": "METHOD_OF" }
+    },
+    "PropertyDefinition": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "PropertyDefinition"
+            },
+            "key": {
+              "oneOf": [
+                {},
+                {
+                  "$ref": "#/definitions/PrivateIdentifier"
+                }
+              ]
+            },
+            "value": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "computed": {
+              "type": "boolean"
+            },
+            "static": {
+              "type": "boolean"
+            }
+          },
+          "required": ["key", "computed", "static"]
+        }
+      ],
+      "x-graph": { "nodeLabel": "VARIABLE" }
+    },
+    "PrivateIdentifier": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "PrivateIdentifier"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"]
+        }
+      ]
+    },
+    "StaticBlock": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "StaticBlock"
+            },
+            "body": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["body"]
+        }
+      ]
+    },
+    "ClassDeclaration": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Class"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ClassDeclaration"
+            },
+            "id": {
+              "$ref": "node.json#/definitions/Identifier"
+            }
+          },
+          "required": ["id"]
+        }
+      ],
+      "x-graph": { "nodeLabel": "CLASS", "edgeLabel": "EXTEND", "condition": "node.superClass != null" }
+    },
+    "ClassExpression": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Class"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ClassExpression"
+            }
+          }
+        }
+      ],
+      "x-graph": { "nodeLabel": "CLASS", "edgeLabel": "EXTEND", "condition": "node.superClass != null" }
+    },
+    "AnonymousClassDeclaration": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Class"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ClassDeclaration"
+            },
+            "id": {
+              "type": "null"
+            }
+          },
+          "required": ["id"]
+        }
+      ]
+    }
+  }
+}

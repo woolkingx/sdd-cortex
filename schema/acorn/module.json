@@ -1,0 +1,316 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/module.json",
+  "definitions": {
+    "ImportDeclaration": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportDeclaration"
+            },
+            "specifiers": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/ImportSpecifier"
+                  },
+                  {
+                    "$ref": "#/definitions/ImportDefaultSpecifier"
+                  },
+                  {
+                    "$ref": "#/definitions/ImportNamespaceSpecifier"
+                  }
+                ]
+              }
+            },
+            "source": {
+              "$ref": "node.json#/definitions/Literal"
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImportAttribute"
+              }
+            }
+          },
+          "required": ["specifiers", "source", "attributes"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "IMPORT", "binding": "import" }
+    },
+    "ImportSpecifier": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportSpecifier"
+            },
+            "imported": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                }
+              ]
+            },
+            "local": {
+              "$ref": "node.json#/definitions/Identifier"
+            }
+          },
+          "required": ["imported", "local"]
+        }
+      ]
+    },
+    "ImportDefaultSpecifier": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportDefaultSpecifier"
+            },
+            "local": {
+              "$ref": "node.json#/definitions/Identifier"
+            }
+          },
+          "required": ["local"]
+        }
+      ]
+    },
+    "ImportNamespaceSpecifier": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportNamespaceSpecifier"
+            },
+            "local": {
+              "$ref": "node.json#/definitions/Identifier"
+            }
+          },
+          "required": ["local"]
+        }
+      ]
+    },
+    "ImportAttribute": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ImportAttribute"
+            },
+            "key": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                }
+              ]
+            },
+            "value": {
+              "$ref": "node.json#/definitions/Literal"
+            }
+          },
+          "required": ["key", "value"]
+        }
+      ]
+    },
+    "ExportNamedDeclaration": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ExportNamedDeclaration"
+            },
+            "declaration": {
+              "oneOf": [
+                {},
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "specifiers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExportSpecifier"
+              }
+            },
+            "source": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImportAttribute"
+              }
+            }
+          },
+          "required": ["specifiers", "attributes"]
+        }
+      ],
+      "x-graph": { "nodeExported": true, "edgeLabel": "REEXPORT", "condition": "node.source != null" }
+    },
+    "ExportSpecifier": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ExportSpecifier"
+            },
+            "exported": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                }
+              ]
+            },
+            "local": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                }
+              ]
+            }
+          },
+          "required": ["exported", "local"]
+        }
+      ]
+    },
+    "ExportDefaultDeclaration": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ExportDefaultDeclaration"
+            },
+            "declaration": {
+              "oneOf": [
+                {
+                  "$ref": "function.json#/definitions/AnonymousFunctionDeclaration"
+                },
+                {
+                  "$ref": "function.json#/definitions/FunctionDeclaration"
+                },
+                {
+                  "$ref": "class.json#/definitions/AnonymousClassDeclaration"
+                },
+                {
+                  "$ref": "class.json#/definitions/ClassDeclaration"
+                },
+                {}
+              ]
+            }
+          },
+          "required": ["declaration"]
+        }
+      ],
+      "x-graph": { "nodeExported": true }
+    },
+    "ExportAllDeclaration": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ExportAllDeclaration"
+            },
+            "source": {
+              "$ref": "node.json#/definitions/Literal"
+            },
+            "exported": {
+              "oneOf": [
+                {
+                  "$ref": "node.json#/definitions/Identifier"
+                },
+                {
+                  "$ref": "node.json#/definitions/Literal"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "attributes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImportAttribute"
+              }
+            }
+          },
+          "required": ["source", "attributes"]
+        }
+      ],
+      "x-graph": { "edgeLabel": "REEXPORT" }
+    },
+    "ModuleDeclaration": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ImportDeclaration"
+        },
+        {
+          "$ref": "#/definitions/ExportNamedDeclaration"
+        },
+        {
+          "$ref": "#/definitions/ExportDefaultDeclaration"
+        },
+        {
+          "$ref": "#/definitions/ExportAllDeclaration"
+        }
+      ]
+    }
+  }
+}

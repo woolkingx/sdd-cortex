@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "analysis/advice.json",
+  "title": "AnalysisAdvice",
+  "description": "Actionable recommendations from analysis.",
+
+  "definitions": {
+
+    "Advice": {
+      "description": "A concrete, actionable recommendation derived from graph analysis.",
+      "type": "object",
+      "properties": {
+        "type":     { "type": "string", "enum": ["violation", "large_file", "high_fan_out", "high_fan_in", "orphan", "schema_gap", "schema_stale", "hot_path", "cycle", "complexity", "coupling", "duplicate_instantiation"], "description": "Advice category" },
+        "severity": { "type": "string", "enum": ["error", "warning", "info"] },
+        "file":     { "type": "string", "description": "Primary file this advice concerns" },
+        "message":  { "type": "string", "description": "Human-readable recommendation" },
+        "detail":   { "type": "string", "description": "Additional context (fn names, metrics)" }
+      },
+      "required": ["type", "severity", "file", "message"],
+
+      "x-docs": {
+        "intent": "Actionable output. Each advice maps to one concrete fix the developer can make.",
+        "category": "analysis"
+      }
+    },
+
+    "SchemaGap": {
+      "description": "A mismatch between code and schema declarations.",
+      "type": "object",
+      "properties": {
+        "type":   { "type": "string", "enum": [
+          "missing_in_schema",
+          "stale_in_schema",
+          "no_xmethods",
+          "stale_xmethod",
+          "param_mismatch"
+        ], "description": "missing = exported but not in registry. stale = in registry but not exported. no_xmethods = exported fn has no x-methods entry. stale_xmethod = x-methods entry but fn not found. param_mismatch = paramCount differs from schema." },
+        "file":   { "type": "string" },
+        "symbol": { "type": "string" },
+        "detail": { "type": "string", "description": "Extra context e.g. expected vs actual paramCount" }
+      },
+      "required": ["type", "file", "symbol"],
+
+      "x-docs": {
+        "intent": "Schema-code drift detection — exports, x-methods, and param signatures.",
+        "category": "schema-overlay"
+      }
+    },
+
+    "DuplicateInstantiation": {
+      "description": "A factory function instantiated independently in multiple files instead of being shared.",
+      "type": "object",
+      "properties": {
+        "factory":     { "type": "string", "description": "Factory function name (e.g. 'createLifecycle')" },
+        "sourceFile":  { "type": "string", "description": "File that exports the factory" },
+        "callers":     { "type": "array", "items": { "type": "string" }, "minItems": 2, "description": "Files that each independently instantiate this factory" }
+      },
+      "required": ["factory", "sourceFile", "callers"],
+
+      "x-docs": {
+        "intent": "Detects factories called independently in N≥2 files. Each call creates a separate instance — may indicate missing shared singleton.",
+        "category": "analysis"
+      }
+    }
+
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "graph/binding.json",
+  "definitions": {
+    "BindingKind": {
+      "enum": [
+        "import",
+        "require",
+        "factory_instance",
+        "destructure",
+        "array_destructure",
+        "reassignment",
+        "spread",
+        "parameter"
+      ]
+    },
+    "BindingInfo": {
+      "type": "object",
+      "properties": {
+        "sourceFile":  { "type": "string" },
+        "symbolName":  { "type": "string" },
+        "kind":        { "$ref": "#/definitions/BindingKind" }
+      },
+      "required": ["sourceFile", "symbolName", "kind"]
+    }
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "acorn/pattern.json",
+  "definitions": {
+    "ObjectPattern": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ObjectPattern"
+            },
+            "properties": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/definitions/AssignmentProperty"
+                  },
+                  {
+                    "$ref": "#/definitions/RestElement"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["properties"]
+        }
+      ],
+      "x-graph": { "binding": "destructure" }
+    },
+    "ArrayPattern": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "ArrayPattern"
+            },
+            "elements": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {},
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": ["elements"]
+        }
+      ],
+      "x-graph": { "binding": "array_destructure" }
+    },
+    "RestElement": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "RestElement"
+            },
+            "argument": {}
+          },
+          "required": ["argument"]
+        }
+      ]
+    },
+    "AssignmentPattern": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "AssignmentPattern"
+            },
+            "left": {},
+            "right": {}
+          },
+          "required": ["left", "right"]
+        }
+      ]
+    },
+    "AssignmentProperty": {
+      "allOf": [
+        {
+          "$ref": "node.json#/definitions/Node"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "Property"
+            },
+            "key": {},
+            "value": {},
+            "kind": {
+              "const": "init"
+            },
+            "method": {
+              "const": false
+            },
+            "shorthand": {
+              "type": "boolean"
+            },
+            "computed": {
+              "type": "boolean"
+            }
+          },
+          "required": ["key", "value", "kind", "method", "shorthand", "computed"]
+        }
+      ]
+    },
+    "Pattern": {
+      "oneOf": [
+        {
+          "$ref": "node.json#/definitions/Identifier"
+        },
+        {
+          "$ref": "#/definitions/ObjectPattern"
+        },
+        {
+          "$ref": "#/definitions/ArrayPattern"
+        },
+        {
+          "$ref": "#/definitions/RestElement"
+        },
+        {
+          "$ref": "#/definitions/AssignmentPattern"
+        }
+      ]
+    }
+  }
+}
